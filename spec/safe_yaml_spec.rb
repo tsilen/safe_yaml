@@ -330,6 +330,18 @@ describe YAML do
         result.backdoor.should == { "foo" => "bar" }
       end
 
+      it "will handle aliases and anchors of whitelisted tags" do
+        result = YAML.safe_load <<-YAML
+          - &1 !ruby/object:OpenStruct
+            table:
+              foo: bar
+          - *1
+        YAML
+        result.map(&:class).should == [OpenStruct, OpenStruct]
+        result[0].instance_variable_get(:@table).should == { "foo" => "bar" }
+        result[1].instance_variable_get(:@table).should == { "foo" => "bar" }
+      end
+
       context "with the :raise_on_unknown_tag option enabled" do
         before :each do
           SafeYAML::OPTIONS[:raise_on_unknown_tag] = true
