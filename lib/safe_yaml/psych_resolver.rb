@@ -22,6 +22,7 @@ module SafeYAML
     end
 
     def native_resolve(node)
+      @aliased_nodes[node.anchor] = node if node.respond_to?(:anchor) && node.anchor
       @visitor ||= SafeYAML::SafeToRubyVisitor.new(self)
       @visitor.accept(node)
     end
